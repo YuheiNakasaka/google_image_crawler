@@ -14,17 +14,13 @@ class GoogleImageClient
   end
 
   def get
-    resource.select { |s| valid_extension?(s) }.sample(@options[:count]) if resource
+    resource.sample(@options[:count]) if resource
   rescue => exception
     lg("Error: #{self}##{__method__} - #{exception}")
     nil
   end
 
   private
-
-  def valid_extension?(url)
-    !url.match(/#{@options[:ext]}$/).nil?
-  end
 
   def resource
     @resource ||= begin
@@ -53,6 +49,7 @@ class GoogleImageClient
       rsz: 8,
       safe: "active",
       v: "1.0",
+      as_filetype: @options[:ext]
     }
   end
 
