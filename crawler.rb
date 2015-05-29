@@ -14,8 +14,7 @@ class GoogleImageClient
   end
 
   def get
-    resource
-    resource.map {|r| r["unescapedUrl"]} if resource
+    resource.select { |s| valid_extension?(s) }.sample(@options[:count]) if resource
   rescue => exception
     lg("Error: #{self}##{__method__} - #{exception}")
     nil
@@ -23,10 +22,14 @@ class GoogleImageClient
 
   private
 
+  def valid_extension?(url)
+    !url.match(/#{@options[:ext]}$/).nil?
+  end
+
   def resource
     @resource ||= begin
       if data = response.body["responseData"]
-        data["results"]
+        data["results"].map { |r| r["unescapedUrl"] }
       end
     end
   end
@@ -47,7 +50,7 @@ class GoogleImageClient
 
   def default_params
     {
-      rsz: 2,
+      rsz: 8,
       safe: "active",
       v: "1.0",
     }
@@ -114,7 +117,7 @@ parsed_csv.each_with_index do |row,i|
   lg("[#{i}] Download #{row['keyword']}")
   filename_head = format("%08d",i)
   # URL取得
-  gic = GoogleImageClient.new(query: row["keyword"])
+  gic = GoogleImageClient.new(query: row["keyword"], count: config["image_count"], ext: config["extension"])
   Parallel.each_with_index(gic.get) do |url,j|
     begin
       @downloader = Downloader.new(filename: "#{download_dir}#{filename_head}-#{j}.jpg")
