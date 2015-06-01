@@ -72,7 +72,11 @@ class Downloader
 
   def download(url)
     response = connection.get(url)
-    create_file(response) if response.status == 200
+    if response.status == 200
+      create_file(response)
+    else
+      raise 'error'
+    end
   rescue => exception
     lg("Error: #{self}##{__method__} - #{exception}")
     raise 'error'
