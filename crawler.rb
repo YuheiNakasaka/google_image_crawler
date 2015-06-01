@@ -72,10 +72,10 @@ class Downloader
 
   def download(url)
     response = connection.get(url)
-    create_file(response)
+    create_file(response) if response.status == 200
   rescue => exception
     lg("Error: #{self}##{__method__} - #{exception}")
-    nil
+    raise 'error'
   end
 
   private
@@ -112,17 +112,21 @@ download_dir = FileUtils.mkdir_p(full_dir).first
 # 画像ダウンロード
 parsed_csv.each_with_index do |row,i|
   lg("[#{i}] Download #{row['keyword']}")
+  current_image_count = 0
   filename_head = format("%08d",i)
   # URL取得
-  gic = GoogleImageClient.new(query: row["keyword"], count: config["image_count"], ext: config["extension"])
-  Parallel.each_with_index(gic.get) do |url,j|
+  gic = GoogleImageClient.new(query: row["keyword"], count: config["image_url_count"], ext: config["extension"])
+  gic.get.each_with_index do |url,j|
     begin
       @downloader = Downloader.new(filename: "#{download_dir}#{filename_head}-#{j}.jpg")
       @downloader.download(url)
+      current_image_count += 1
+      break if current_image_count >= config["fetch_image_count"].to_i
     rescue
       lg("CoundNotDownload => FileName: #{download_dir}#{filename_head}-#{j}.jpg, SouceUrl: #{url}\n")
       next
     end
   end
 end
+
 lg("Finished all")
