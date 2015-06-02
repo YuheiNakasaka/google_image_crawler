@@ -1,5 +1,5 @@
 # google image crawler
-与えられたcsvファイルのキーワードをグーグル画像検索API(deprecated)を利用して検索し、取得したURLの画像をローカルにダウンロードする
+与えられたcsvファイルのキーワードをGoogle画像検索フォームを利用して検索し、取得したURLの画像をローカルにダウンロードする
 
 # Setup
 
@@ -12,11 +12,11 @@ sh initialize.sh
 
 # Usage
 
-1. config.ymlにcsvのファイルパスと画像のdownload_directoryを記述(download_directoryはデフォルトのままでもよい)
+1. config.jsonにcsvのファイルパスを記述
 2. google_image_crawlerディレクトリ配下で以下を実行
 
 ```
-ruby crawler.rb
+casperjs crawler.js --ignore-ssl-errors=yes
 ```
 
 # Example
@@ -24,12 +24,10 @@ ruby crawler.rb
 example.csvを使用して実行する場合(デフォルト設定)
 
 ```
-$ ruby crawler.rb
-[2015/05/28 14:40] Start crawling...
-[2015/05/28 14:40] [0] Download ラブライブ
-[2015/05/28 14:40] [1] Download SHIROBAKO
-[2015/05/28 14:40] [2] Download 遊戯王
-[2015/05/28 14:41] [3] Download 黒子のバスケ
-[2015/05/28 14:41] [4] Download けいおん
-[2015/05/28 14:42] Finished all
+$ casperjs crawler.js --ignore-ssl-errors=yes
+[2015/06/02 15:47:10] Start crawling https://www.google.co.jp/imghp
+[2015/06/02 15:47:10] create images into ./images/1433227630399/
+[2015/06/02 15:47:11] keyword
+[2015/06/02 15:47:14] ラブライブ
+[2015/06/02 15:47:16] SHIROBAKO
 ```
